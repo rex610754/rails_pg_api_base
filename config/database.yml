@@ -1,0 +1,22 @@
+default: &default
+  adapter: postgresql
+  encoding: unicode
+  pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
+  host: <%= ENV.fetch("DB_HOST", "127.0.0.1") %>
+  username: postgres
+  password: password
+  port: <%= ENV.fetch("DB_PORT", "5433") %>
+
+development:
+  <<: *default
+  database: gym_lms_development
+
+test:
+  <<: *default
+  database: gym_lms_test
+
+production:
+  <<: *default
+  database: gym_lms_production
+  username: <%= ENV["GYM_LMS_DATABASE_USERNAME"] %>
+  password: <%= ENV["GYM_LMS_DATABASE_PASSWORD"] %>

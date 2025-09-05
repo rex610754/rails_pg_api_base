@@ -1,0 +1,40 @@
+version: '3.8'
+services:
+  db:
+    image: postgres:15.4
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: ${DATABASE_NAME}
+      POSTGRES_HOST_AUTH_METHOD: md5
+    volumes:
+      - ${DB_VOLUME_PATH:-postgres_data}:/var/lib/postgresql/data
+    ports:
+      - "5433:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  web:
+    build: .
+    command: bash -c "rm -f tmp/pids/server.pid && bundle exec rails s -p 3000 -b '0.0.0.0'"
+    environment:
+      RAILS_ENV: ${RAILS_ENV:-development}
+      DATABASE_NAME: ${DATABASE_NAME}
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      DB_HOST: db
+      DB_PORT: 5432
+      DATABASE_URL: postgresql://postgres:password@db:5432/${DATABASE_NAME}
+    ports:
+      - "${PORT:-3000}:3000"
+    volumes:
+      - ${APP_VOLUME_PATH:-.}:/usr/src/app
+    depends_on:
+      - db
+
+volumes:
+  postgres_data:
+    driver: local
