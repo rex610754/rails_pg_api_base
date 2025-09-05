@@ -49,14 +49,14 @@ RUN groupadd --system --gid $GID rails && \
     useradd rails --uid $UID --gid $GID --create-home --shell /bin/bash && \
     chown -R rails:rails db log storage tmp
 
-# Copy and setup entrypoint script
-COPY entrypoint.sh /usr/src/app/bin/docker-entrypoint
-RUN chmod +x /usr/src/app/bin/docker-entrypoint && \
-    chown rails:rails /usr/src/app/bin/docker-entrypoint
+# Copy and setup entrypoint script into a safe path outside volume mount
+COPY entrypoint.sh /docker-entrypoint.sh
+RUN chmod +x /docker-entrypoint.sh && \
+    chown rails:rails /docker-entrypoint.sh
 
 USER $UID:$GID
 
-ENTRYPOINT ["/usr/src/app/bin/docker-entrypoint"]
+ENTRYPOINT ["/docker-entrypoint.sh"]
 
 EXPOSE 3000
 CMD ["./bin/rails", "server"]

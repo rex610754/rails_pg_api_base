@@ -2,7 +2,7 @@
 set -e
 
 # Remove a potentially pre-existing server.pid for Rails
-rm -f /rails/tmp/pids/server.pid
+rm -f /usr/src/app/tmp/pids/server.pid
 
 # Wait for database to be ready
 until PGPASSWORD=$POSTGRES_PASSWORD psql -h "db" -U "postgres" -c '\q'; do
