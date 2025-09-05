@@ -1,24 +1,19 @@
 # README
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+## Development Setup
 
-Things you may want to cover:
+1. Copy the example environment file and create your local `.env`:
+   ```sh
+   cp .env.example .env
 
-* Ruby version
+2. Build and start the containers:
+   ```sh
+   ./docker-build.sh
 
-* System dependencies
+3. Access the Rails container (if needed):
+   ```sh
+   docker-compose exec api bash
 
-* Configuration
-
-* Database creation
-
-* Database initialization
-
-* How to run the test suite
-
-* Services (job queues, cache servers, search engines, etc.)
-
-* Deployment instructions
-
-* ...
+4. Run Rails commands inside the container, for example:
+   ```sh
+   docker-compose exec api bin/rails db:create db:migrate
