@@ -59,4 +59,5 @@ USER $UID:$GID
 ENTRYPOINT ["/docker-entrypoint.sh"]
 
 EXPOSE 3000
-CMD ["./bin/rails", "server"]
+# Run Puma by default for production, unless overridden from docker-compose
+CMD ["bundle", "exec", "puma", "-C", "config/puma.rb"]

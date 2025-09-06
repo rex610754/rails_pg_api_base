@@ -8,12 +8,30 @@
 
 2. Build and start the containers:
    ```sh
-   ./docker-build.sh
+   ./docker.sh build
 
-3. Access the Rails container (if needed):
+3. Start:
    ```sh
-   docker-compose exec api bash
+   ./docker.sh up
 
-4. Run Rails commands inside the container, for example:
+4. Start in detached mode:
+   ```sh
+   ./docker.sh up-d
+
+5. Stop:
+   ```sh
+   ./docker.sh down
+
+6. Logs:
+   ```sh
+   ./docker.sh logs
+
+7. Access the Rails container (if needed):
+   ```sh
+   ./docker.sh exec api bash
+
+8. Run Rails commands inside the container, for example:
    ```sh
    docker-compose exec api bin/rails db:create db:migrate
+   # OR
+   ./docker.sh exec api bin/rails db:create db:migrate
