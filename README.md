@@ -2,48 +2,50 @@
 
 ## Development Setup
 
-We are using local UID to reflect docker reflect changes done by commands on docker container to local.
+We are using the local UID/GID so that changes made inside the Docker container reflect correctly on your local filesystem.
 
-1. Copy the example environment file and create your local `.env`:
-   ```sh
-   cp .env.example .env
+1. Environment Setup  
+   Copy the example environment file and create your local `.env`:  
+   cp .env.example .env  
 
-2. Build and start the containers:
-   ```sh
-   ./docker.sh build
+2. Common Commands  
+   docker-compose up --build         # build and run containers  
+   docker-compose up                 # run containers  
+   docker-compose down               # stop containers  
+   docker-compose up -d              # run containers in detached mode  
+   docker-compose logs               # check logs  
+   docker-compose exec api bash      # access Rails container bash  
+   docker-compose exec api bin/rails db:migrate   # run migrations  
+   docker-compose exec api bin/rails c            # run Rails console  
 
-3. Start:
-   ```sh
-   ./docker.sh up
+---
 
-4. Start in detached mode:
-   ```sh
-   ./docker.sh up-d
+## Adding / Removing Gems
 
-5. Stop:
-   ```sh
-   ./docker.sh down
+1. Add gems  
+   - Stop containers  
+   - Add gems in the Gemfile  
+   - Start containers again  
+   - You will see the Gemfile.lock updated automatically  
 
-6. Logs:
-   ```sh
-   ./docker.sh logs
+2. Remove gems  
+   - Stop containers  
+   - Remove gems from the Gemfile  
+   - Start containers again  
+   - Gemfile.lock should update  
+   - Always commit both Gemfile and Gemfile.lock  
 
-7. Access the Rails container (if needed):
-   ```sh
-   ./docker.sh exec api bash
+---
 
-8. Run Rails commands inside the container, for example:
-   ```sh
-   docker-compose exec api bin/rails db:create db:migrate
-   # OR
-   ./docker.sh exec api bin/rails db:create db:migrate
+## Logger Notes
 
-## Logger Note:
+Rails logs for production are sent to STDOUT.  
+Configure CloudWatch Logs Agent (or the awslogs driver in Docker Compose) with a retention period (e.g., 7, 14, or 30 days).  
 
-1. Rails logs for production is sent to STDOUT, and so configure CloudWatch Logs Agent (or awslogs driver in Docker Compose) with a retention period (e.g. 7, 14, 30 days). In case if you want to manage it manually. You need following configuration.
-  ```sh
-  config.logger = Logger.new(
-    Rails.root.join("log", "#{Rails.env}.log"),
-    10, # keep 10 rotated files
-    50 * 1024 * 1024 # max size 50 MB per file
-  )
+If you want to manage logs manually, add this configuration in `config/environments/production.rb`:  
+
+config.logger = Logger.new(
+  Rails.root.join("log", "#{Rails.env}.log"),
+  10,                  # keep 10 rotated files
+  50 * 1024 * 1024     # max size 50 MB per file
+)
