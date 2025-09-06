@@ -5,10 +5,12 @@
 We are using the local UID/GID so that changes made inside the Docker container reflect correctly on your local filesystem.
 
 1. Environment Setup  
-   Copy the example environment file and create your local `.env`:  
+   Copy the example environment file and create your local `.env`:
+   ```sh
    cp .env.example .env  
 
-2. Common Commands  
+3. Common Commands
+   ```sh
    docker-compose up --build         # build and run containers  
    docker-compose up                 # run containers  
    docker-compose down               # stop containers  
@@ -43,7 +45,7 @@ Rails logs for production are sent to STDOUT.
 Configure CloudWatch Logs Agent (or the awslogs driver in Docker Compose) with a retention period (e.g., 7, 14, or 30 days).  
 
 If you want to manage logs manually, add this configuration in `config/environments/production.rb`:  
-
+```ruby
 config.logger = Logger.new(
   Rails.root.join("log", "#{Rails.env}.log"),
   10,                  # keep 10 rotated files
