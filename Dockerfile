@@ -37,16 +37,17 @@ RUN bundle exec bootsnap precompile app/ lib/
 # Final stage for app image
 FROM base
 
-ARG UID=1000
-ARG GID=1000
+# Fixed UID/GID values
+ENV UID=1000
+ENV GID=1000
 
 # Copy built artifacts: gems, application
 COPY --from=build "${BUNDLE_PATH}" "${BUNDLE_PATH}"
 COPY --from=build /usr/src/app /usr/src/app
 
-# Create non-root user
-RUN groupadd --system --gid $GID rails && \
-    useradd rails --uid $UID --gid $GID --create-home --shell /bin/bash && \
+# Create non-root user with fixed UID/GID
+RUN groupadd --system --gid ${GID} rails && \
+    useradd rails --uid ${UID} --gid ${GID} --create-home --shell /bin/bash && \
     chown -R rails:rails db log storage tmp
 
 # Copy and setup entrypoint script into a safe path outside volume mount
@@ -54,7 +55,7 @@ COPY entrypoint.sh /docker-entrypoint.sh
 RUN chmod +x /docker-entrypoint.sh && \
     chown rails:rails /docker-entrypoint.sh
 
-USER $UID:$GID
+USER ${UID}:${GID}
 
 ENTRYPOINT ["/docker-entrypoint.sh"]
 
