@@ -2,8 +2,6 @@
 
 ## Development Setup
 
-We are using the local UID/GID so that changes made inside the Docker container reflect correctly on your local filesystem.
-
 1. Environment Setup  
    Copy the example environment file and create your local `.env`:
    ```sh
