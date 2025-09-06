@@ -2,7 +2,7 @@
 set -e
 
 # Remove a potentially pre-existing server.pid for Rails
-rm -f /rails/tmp/pids/server.pid
+rm -f /usr/src/app/tmp/pids/server.pid
 
 # Wait for database to be ready
 until PGPASSWORD="$POSTGRES_PASSWORD" psql -h "$DB_HOST" -U "$POSTGRES_USER" -c '\q' >/dev/null 2>&1; do
@@ -12,8 +12,12 @@ done
 
 # Run migrations only in development
 if [ "$RAILS_ENV" = "development" ]; then
-  echo "Running in development - checking database and migrations..."
 
+  echo "Installing gems..."
+  bundle install && bundle clean --force
+  echo "Gems synced with Gemfile.lock."
+
+  echo "Running in development - checking database and migrations..."
   # Check if database exists
   if ! PGPASSWORD="$POSTGRES_PASSWORD" psql -h "$DB_HOST" -U "$POSTGRES_USER" -lqt | cut -d \| -f 1 | grep -qw "$DATABASE_NAME"; then
     echo "Database $DATABASE_NAME does not exist. Creating..."

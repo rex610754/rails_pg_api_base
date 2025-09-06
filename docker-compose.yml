@@ -23,6 +23,9 @@ services:
     command: bash -c "rm -f tmp/pids/server.pid && bundle exec rails s -p 3000 -b '0.0.0.0'"
     environment:
       RAILS_ENV: development
+      BUNDLE_FROZEN: "false"
+      BUNDLE_DEPLOYMENT: "false"
+      BUNDLE_WITHOUT: ""
       DATABASE_NAME: ${DATABASE_NAME}
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
