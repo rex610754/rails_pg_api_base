@@ -20,6 +20,17 @@
 
 ---
 
+## Debug mode
+
+We run rails in docker without attached TTY so when containers are running, run following command to open interactive shell to respond `binding.pry`:
+   ```sh
+   bin/debug
+   ```
+
+`bin/debug` will take care of it. You can type `continue` to detach with Ctrl-p Ctrl-q but do not use Ctrl-c, it will kill the container.
+
+---
+
 ## Adding / Removing Gems
 
 1. Add gems  
