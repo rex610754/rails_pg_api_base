@@ -1,0 +1,17 @@
+#!/bin/bash
+set -euo pipefail
+
+APP_CONTAINER=api
+
+# Get the first matching running container
+CONTAINER_ID=$(docker ps --filter "name=${APP_CONTAINER}" --format "{{.ID}}" | head -n 1)
+
+if [ -z "$CONTAINER_ID" ]; then
+  echo "❌ Failed to find container: $APP_CONTAINER running?"
+  exit 1
+fi
+
+echo "✅ Attaching to container: $APP_CONTAINER ($CONTAINER_ID)"
+echo "👉 Detach with Ctrl-p Ctrl-q (do NOT use Ctrl-c, it will kill the container!)"
+
+docker attach --sig-proxy=false "$CONTAINER_ID"

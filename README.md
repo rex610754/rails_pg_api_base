@@ -2,8 +2,6 @@
 
 ## Development Setup
 
-We are using the local UID/GID so that changes made inside the Docker container reflect correctly on your local filesystem.
-
 1. Environment Setup  
    Copy the example environment file and create your local `.env`:
    ```sh
@@ -19,6 +17,17 @@ We are using the local UID/GID so that changes made inside the Docker container 
    docker-compose exec api bash      # access Rails container bash  
    docker-compose exec api bin/rails db:migrate   # run migrations  
    docker-compose exec api bin/rails c            # run Rails console  
+
+---
+
+## Debug mode
+
+We run rails in docker without attached TTY so when containers are running, run following command to open interactive shell to respond `binding.pry`:
+   ```sh
+   bin/debug
+   ```
+
+`bin/debug` will take care of it. You can type `continue` to detach with Ctrl-p Ctrl-q but do not use Ctrl-c, it will kill the container.
 
 ---
 
