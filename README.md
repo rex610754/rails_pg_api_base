@@ -2,62 +2,101 @@
 
 ## Development Setup
 
-1. Environment Setup  
-   Copy the example environment file and create your local `.env`:
-   ```sh
-   cp .env.example .env  
+### 1. Environment Setup
 
-3. Common Commands
-   ```sh
-   docker-compose up --build         # build and run containers  
-   docker-compose up                 # run containers  
-   docker-compose down               # stop containers  
-   docker-compose up -d              # run containers in detached mode  
-   docker-compose logs               # check logs  
-   docker-compose exec api bash      # access Rails container bash  
-   docker-compose exec api bin/rails db:migrate   # run migrations  
-   docker-compose exec api bin/rails c            # run Rails console  
+Copy the example environment file and create your local `.env`:
+
+```sh
+cp .env.example .env
+```
+
+### 2. Common Commands
+
+```sh
+# Build and run containers (no cache)
+docker-compose up --build --no-cache
+
+# Run containers
+docker-compose up
+
+# Stop containers
+docker-compose down
+
+# Run containers in detached mode
+docker-compose up -d
+
+# Check logs
+docker-compose logs
+
+# Access Rails container bash
+docker-compose exec api bash
+
+# Run Rails migrations
+docker-compose exec api bin/rails db:migrate
+
+# Open Rails console
+docker-compose exec api bin/rails c
+
+# Production mode
+# Build in production mode
+docker-compose -f docker-compose.prod.yml --env-file .env.prod build --no-cache
+# Start in production mode
+docker-compose -f docker-compose.prod.yml --env-file .env.prod up
+# Run migrations in production
+docker-compose -f docker-compose.prod.yml --env-file .env.prod run --rm api bin/rails db:migrate
+```
 
 ---
 
-## Debug mode
+## Debug Mode
 
-We run rails in docker without attached TTY so when containers are running, run following command to open interactive shell to respond `binding.pry`:
-   ```sh
-   bin/debug
-   ```
+Rails runs in Docker without an attached TTY by default. To open an interactive shell for `binding.pry` or debugging:
 
-`bin/debug` will take care of it. You can type `continue` to detach with Ctrl-p Ctrl-q but do not use Ctrl-c, it will kill the container.
+```sh
+bin/debug
+```
+
+`bin/debug` handles attaching to the container. Type `continue` to detach using `Ctrl-p Ctrl-q`. **Do not use Ctrl-c**, it will kill the container.
+
+---
+
+## Redis + Sidekiq
+
+Redis and Sidekiq (sharing the Rails image) are added via Docker Compose. Ensure the environment is configured correctly with `{ROOT_FOLDER}-api:latest`.
 
 ---
 
 ## Adding / Removing Gems
 
-1. Add gems  
-   - Stop containers  
-   - Add gems in the Gemfile  
-   - Start containers again  
-   - You will see the Gemfile.lock updated automatically  
+### Adding Gems
 
-2. Remove gems  
-   - Stop containers  
-   - Remove gems from the Gemfile  
-   - Start containers again  
-   - Gemfile.lock should update  
-   - Always commit both Gemfile and Gemfile.lock  
+1. Stop containers
+2. Add gems to the `Gemfile`
+3. Start containers again
+4. `Gemfile.lock` will be updated automatically
+
+> Note: In development mode, `bundle install` runs via the entrypoint each time the container restarts. In production, rely on the built image to avoid redundant installs.
+
+### Removing Gems
+
+1. Stop containers
+2. Remove gems from the `Gemfile`
+3. Start containers again
+4. Ensure `Gemfile.lock` is updated
+5. Commit both `Gemfile` and `Gemfile.lock`
 
 ---
 
 ## Logger Notes
 
-Rails logs for production are sent to STDOUT.  
-Configure CloudWatch Logs Agent (or the awslogs driver in Docker Compose) with a retention period (e.g., 7, 14, or 30 days).  
+Rails logs in production are sent to STDOUT. Configure CloudWatch Logs Agent or use the `awslogs` driver in Docker Compose with a retention period (e.g., 7, 14, or 30 days).
 
-If you want to manage logs manually, add this configuration in `config/environments/production.rb`:  
+To manage logs manually, add the following to `config/environments/production.rb`:
 
 ```ruby
 config.logger = Logger.new(
   Rails.root.join("log", "#{Rails.env}.log"),
-  10,                  # keep 10 rotated files
-  50 * 1024 * 1024     # max size 50 MB per file
+  10,                  # Keep 10 rotated files
+  50 * 1024 * 1024     # Max size 50 MB per file
 )
+```
