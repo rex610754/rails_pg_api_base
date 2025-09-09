@@ -15,11 +15,21 @@ RUN apt-get update -qq && \
 FROM base AS build
 
 RUN apt-get update -qq && \
-    apt-get install --no-install-recommends -y build-essential git libpq-dev pkg-config && \
+    apt-get install --no-install-recommends -y \
+      build-essential git libpq-dev pkg-config \
+      libxml2-dev libxslt-dev zlib1g-dev libffi-dev && \
     rm -rf /var/lib/apt/lists /var/cache/apt/archives
 
+# Set env here so gems are installed the same way they will be used in final stage
+ENV RAILS_ENV=production \
+    BUNDLE_DEPLOYMENT=1 \
+    BUNDLE_PATH=/usr/local/bundle \
+    BUNDLE_WITHOUT=development:test \
+    BUNDLE_FROZEN=true
+
+# Install only gems first (better caching)
 COPY Gemfile Gemfile.lock ./
-RUN bundle install && \
+RUN bundle install --jobs=4 --retry=3 && \
     rm -rf ~/.bundle/ /usr/local/bundle/ruby/*/cache /usr/local/bundle/ruby/*/bundler/gems/*/.git && \
     bundle exec bootsnap precompile --gemfile
 
@@ -37,7 +47,6 @@ ENV RAILS_ENV=production \
     BUNDLE_WITHOUT=development:test \
     BUNDLE_FROZEN=true
 
-# Fixed UID/GID values
 ENV UID=1000
 ENV GID=1000
 
