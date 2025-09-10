@@ -87,6 +87,30 @@ Redis and Sidekiq (sharing the Rails image) are added via Docker Compose. Ensure
 
 ---
 
+## Production Mode
+
+If you want to run production mode locally by allowing `http` requests on different port (as 80 is busy for local), set following env in your `.env.prod`
+```sh
+PORT=8080
+SSL_REQUIRED=false
+```
+
+And test if it is working,
+```sh
+curl http://localhost:8080/health
+```
+You may need following commands,
+```sh
+# Build in production mode
+docker-compose -f docker-compose.prod.yml --env-file .env.prod build --no-cache
+# Start in production mode
+docker-compose -f docker-compose.prod.yml --env-file .env.prod up
+# DO not forget to run migrations in production manually
+docker-compose -f docker-compose.prod.yml --env-file .env.prod run --rm api bin/rails db:migrate
+```
+
+---
+
 ## Logger Notes
 
 Rails logs in production are sent to STDOUT. Configure CloudWatch Logs Agent or use the `awslogs` driver in Docker Compose with a retention period (e.g., 7, 14, or 30 days).
