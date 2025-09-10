@@ -35,7 +35,7 @@ services:
     env_file:
       - .env.prod
     ports:
-      - "${PORT:-80}:3000"
+      - "${PORT:-80}:${PORT:-80}"
     volumes:
       - /usr/src/app/tmp
       - /usr/src/app/log

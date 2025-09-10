@@ -4,7 +4,7 @@ min_threads_count = ENV.fetch("RAILS_MIN_THREADS", max_threads_count).to_i
 threads min_threads_count, max_threads_count
 
 # Default port
-port ENV.fetch("PORT", 3000)
+port ENV.fetch("PORT", 80)
 
 # Environment
 environment ENV.fetch("RAILS_ENV") { "development" }
