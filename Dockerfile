@@ -21,11 +21,7 @@ RUN apt-get update -qq && \
     rm -rf /var/lib/apt/lists /var/cache/apt/archives
 
 # Set env here so gems are installed the same way they will be used in final stage
-ENV RAILS_ENV=production \
-    BUNDLE_DEPLOYMENT=1 \
-    BUNDLE_PATH=/usr/local/bundle \
-    BUNDLE_WITHOUT=development:test \
-    BUNDLE_FROZEN=true
+ENV BUNDLE_PATH=/usr/local/bundle
 
 # Install only gems first (better caching)
 COPY Gemfile Gemfile.lock ./
@@ -41,11 +37,7 @@ RUN bundle exec bootsnap precompile app/ lib/
 FROM base
 
 # Default to production in final image
-ENV RAILS_ENV=production \
-    BUNDLE_DEPLOYMENT=1 \
-    BUNDLE_PATH=/usr/local/bundle \
-    BUNDLE_WITHOUT=development:test \
-    BUNDLE_FROZEN=true
+ENV BUNDLE_PATH=/usr/local/bundle
 
 ENV UID=1000
 ENV GID=1000
@@ -57,7 +49,8 @@ COPY --from=build /usr/src/app /usr/src/app
 # Create non-root user
 RUN groupadd --system --gid ${GID} rails && \
     useradd rails --uid ${UID} --gid ${GID} --create-home --shell /bin/bash && \
-    chown -R rails:rails db log storage tmp
+    chown -R rails:rails db log storage tmp && \
+    chown -R rails:rails /usr/local/bundle
 
 # Entrypoint
 COPY entrypoint.sh /docker-entrypoint.sh

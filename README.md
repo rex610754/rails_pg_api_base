@@ -109,6 +109,45 @@ docker-compose -f docker-compose.prod.yml --env-file .env.prod up
 docker-compose -f docker-compose.prod.yml --env-file .env.prod run --rm api bin/rails db:migrate
 ```
 
+### Deployment note - production
+If working on ec2 instance, try to create docker image locally for production as Dockerfile does not depend on .env.prod file.
+Make sure you are not building production image with unstaged changes or different branch.
+Then it will be simple to pull image on ec2 server and run docker with the help of .env.prod file passed on server (by using scp)
+For later, we will have better way to manage production environment vars and automatic deployment.
+
+### Production sample env file
+
+```
+# Rails environment
+RAILS_ENV=production
+WEB_CONCURRENCY=4
+RAILS_MAX_THREADS=10
+# Rails secret key for production
+SECRET_KEY_BASE=b6f9a2d9c1f3e44a5b7f3b2d7e3e4f1a6b8c2d7f4e3b2c1d5a6e9f0b1c2d3e4f
+# You can build production image and push to docker and fetch on ec2 server.
+RAILS_API_IMAGE=rex610/rails_prod_api
+
+# Database configuration
+POSTGRES_USER=postgres_user
+POSTGRES_PASSWORD=postgres_password
+DATABASE_NAME=gym_lms_production
+DB_HOST=db
+DB_PORT=5432
+
+# Redis
+REDIS_URL=redis://redis:6379/0
+
+# Sidekiq Auth
+SIDEKIQ_USERNAME=sidekiq_admin
+SIDEKIQ_PASSWORD=T8w#z!Q7@92fLr^cVbh3Xp
+# I am using lightweight ec2 instance so for test server I am setting this to 1, but idea practice is 3-5
+SIDEKIQ_CONCURRENCY=1
+
+BUNDLE_DEPLOYMENT=1
+BUNDLE_WITHOUT=development:test
+BUNDLE_FROZEN=true
+```
+
 ---
 
 ## Logger Notes
