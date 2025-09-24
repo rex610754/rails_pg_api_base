@@ -30,11 +30,9 @@ services:
       retries: 5
 
   api:
-    build:
-      context: .
     image: ${RAILS_API_IMAGE}
     env_file:
-      - .env.prod
+      - .env
     ports:
       - "${PORT:-80}:${PORT:-80}"
     volumes:
@@ -48,7 +46,7 @@ services:
     image: ${RAILS_API_IMAGE}
     command: bundle exec sidekiq
     env_file:
-      - .env.prod
+      - .env
     depends_on:
       - ${DB_HOST:-db}
       - redis
